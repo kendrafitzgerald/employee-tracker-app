@@ -74,3 +74,22 @@ function viewEmployees() {
         console.table(results)
     });
 };
+
+function addDepartment () {
+   inquirer .prompt([
+        {
+            type: 'input',
+            message: 'What would you like to call this department?',
+            name: 'addDepartment'
+        }
+   ]).then(answer => {
+        const newDepartment = answer.addDepartment;
+        db.query(`INSERT INTO departments(names) VALUES ("${newDepartment}")`, (err, results) => {
+            if (err) {
+                throw err
+            }
+            console.table(results)
+        });
+   });
+};
+
