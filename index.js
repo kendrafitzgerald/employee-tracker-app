@@ -173,7 +173,10 @@ function addEmployee() {
                     console.log('Added new employee!')
             });
         });
-        
     });
-        
 };
+
+function updateEmployeeRole() {
+    
+}
+
