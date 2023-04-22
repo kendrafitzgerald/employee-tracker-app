@@ -1,4 +1,15 @@
 const inquirer = require('inquirer');
+const mysql = require('mysql2');
+const table = require('console.table');
+
+
+const db = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'Sampson423',
+    database: 'employeetracker_db'
+
+});
 
 inquirer
 .prompt ([
@@ -36,3 +47,30 @@ inquirer
             break;    
     }
 });
+
+function viewDepartments() {
+    db.query('SELECT * FROM departments', (err, results) => {
+        if (err) {
+            throw err;
+        } 
+        console.table(results);
+    });
+};
+
+function viewRoles() {
+    db.query('SELECT roles.title, roles.id, departments.names, roles.salary FROM roles INNER JOIN departments ON roles.department_id = departments.id', (err, results) => {
+        if (err) {
+            throw err;
+        }
+        console.table(results)
+    });
+};
+
+function viewEmployees() {
+    db.query('SELECT ', (err, results) => {
+        if (err) {
+            throw err
+        }
+        console.table(results)
+    });
+};
