@@ -10,7 +10,7 @@ const db = mysql.createConnection({
     database: 'employeetracker_db'
 
 });
-
+function promptList() {
 inquirer
 .prompt ([
 
@@ -46,7 +46,9 @@ inquirer
             updateEmployeeRole();
             break;    
     }
-});
+   });
+};
+promptList();
 
 function viewDepartments() {
     db.query('SELECT * FROM departments', (err, results) => {
@@ -54,6 +56,7 @@ function viewDepartments() {
             throw err;
         } 
         console.table(results);
+        promptList();
     });
 };
 
@@ -62,7 +65,8 @@ function viewRoles() {
         if (err) {
             throw err;
         }
-        console.table(results)
+        console.table(results);
+        promptList();
     });
 };
 
@@ -72,6 +76,7 @@ function viewEmployees() {
             throw err
         }
         console.table(results)
+        promptList();
     });
 };
 
@@ -89,6 +94,7 @@ function addDepartment () {
                 throw err
             }
             console.log('Added new department!')
+            promptList();
         });
    });
 };
@@ -125,7 +131,9 @@ function addRole () {
                 if (err) {
                     throw err
                 }
-                console.log('Added new role!')
+                console.log('Added new role!');
+                promptList();
+
             });
         });
         
@@ -171,12 +179,29 @@ function addEmployee() {
                         throw err
                     }
                     console.log('Added new employee!')
+                    promptList();
             });
         });
     });
+    
 };
 
-function updateEmployeeRole() {
-    
-}
+
+// function updateEmployeeRole() {
+//     inquirer .prompt([
+//         {
+//             type: 'list',
+//             message: 'What employee would you like to update?',
+//             name: 'updateEmployee',
+//             choices: ['employees.first_name, employees.last_name']
+//         }, 
+//         {
+//             type: 'input',
+//             message: 'What is their new role?',
+//             name: 'newRole'
+//         }
+//     ]).then(answer => {
+//         const employee = answer.
+//     })
+// }
 
