@@ -101,7 +101,9 @@ function addDepartment () {
 };
 
 function addRole () {
-    inquirer .prompt([
+   db.query('SELECT * FROM departments', function (err, results) {
+
+   inquirer .prompt([
         {
             type: 'input',
             message: 'What would you like to name this role?',
@@ -113,9 +115,10 @@ function addRole () {
             name: 'newSalary'
         },
         {
-            type: 'input',
+            type: 'rawlist',
             message: 'What is the department for this role?',
-            name: 'newDepartment'
+            name: 'newDepartment',
+            choices: results.map(departments => `${departments.names}`),
         }
     ]).then (answer => {
         const newRole = answer.newRole;
@@ -139,9 +142,11 @@ function addRole () {
         });
         
     });
+  });
 };
 
 function addEmployee() {
+    db.query('SELECT * FROM roles', 'SELECT * FROM employees', function (err, results) {
     inquirer .prompt([
         {
             type: 'input',
@@ -154,20 +159,22 @@ function addEmployee() {
             name: 'lastName'
         },
         {
-            type: 'input',
+            type: 'rawlist',
             message: 'What is their role?',
-            name: 'employeeRole'
-        }
-        // {
-        //     type: 'input',
-        //     message: 'Who is their manager?',
-        //     name: 'manager'
-        // }
+            name: 'employeeRole',
+            choices: results.map(roles => `${roles.title}`)
+        },
+        {
+            type: 'rawlist',
+           message: 'Who is their manager?',
+           name: 'manager',
+           choices: results.map(employees => `${employees.manager_id}`)
+         }
     ]).then (answer => {
         const firstName = answer.firstName;
         const lastName = answer.lastName;
         const role = answer.employeeRole;
-        // const manager = answer.manager
+        const manager = answer.manager
 
         db.query(`SELECT id FROM roles WHERE title =?`, role, (err, results) => {
             if (err) {
@@ -175,7 +182,7 @@ function addEmployee() {
             }
             const roleID = results[0].id
 
-            db.query(`INSERT INTO employees(first_name, last_name, role_id) VALUES (?, ?, ?)`, [firstName, lastName, roleID], (err, results) => {
+            db.query(`INSERT INTO employees(first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [firstName, lastName, roleID, manager], (err, results) => {
                     if (err) {
                         throw err
                     }
@@ -184,25 +191,52 @@ function addEmployee() {
             });
         });
     });
-    
+  });
 };
 
 
-// function updateEmployeeRole() {
-//     inquirer .prompt([
-//         {
-//             type: 'list',
-//             message: 'What employee would you like to update?',
-//             name: 'updateEmployee',
-//             choices: ['employees.first_name, employees.last_name']
-//         }, 
-//         {
-//             type: 'input',
-//             message: 'What is their new role?',
-//             name: 'newRole'
-//         }
-//     ]).then(answer => {
-//         const employee = answer.
-//     })
-// }
+function updateEmployeeRole() {
+    db.query('SELECT * FROM employees', function (err, employeeResults) {
+        if (err) {
+            throw err;
+        }
+        db.query('SELECT * FROM roles', function (err, roleResults) {
+            if (err) {
+                throw err;
+            }
+            inquirer.prompt([
+                {
+                    type: 'rawlist',
+                    message: 'What employee would you like to update?',
+                    name: 'updateEmployee',
+                    choices: employeeResults.map(employee => `${employee.first_name} ${employee.last_name}`)
+                }, 
+                {
+                    type: 'rawlist',
+                    message: 'What is their new role?',
+                    name: 'newRole',
+                    choices: roleResults.map(role => role.title)
+                }
+            ]).then(answer => {
+                const employee = answer.updateEmployee;
+                const role = answer.newRole;
+
+                db.query(`SELECT id FROM roles WHERE title = ?`, [role], (err, results) => {
+                    if (err) {
+                        throw err;
+                    }
+                    const roleID = results[0].id;
+
+                    db.query(`UPDATE employees SET role_id = ?  WHERE CONCAT(first_name, ' ', last_name) = ?`, [roleID, employee], (err, results) => {
+                        if (err) {
+                            throw err;
+                        }
+                        console.log('Updated employee role!');
+                        promptList();
+                    });
+                });
+            });
+        });
+    });
+}
 
