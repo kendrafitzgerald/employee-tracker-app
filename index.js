@@ -150,7 +150,7 @@ function addEmployee() {
         if(err) {
             throw err
         }
-    db.query('SELECT * FROM employees', function (err, employeeResults) {
+    db.query('SELECT * FROM employees WHERE manager_id IS NULL', function (err, employeeResults) {
     inquirer .prompt([
         {
             type: 'input',
@@ -185,11 +185,12 @@ function addEmployee() {
                 throw err
             }
             const roleID = results[0].id
-        db.query(`SELECT id FROM employees WHERE CONCAT (first_name, " ", last_name)`, manager, (err, results) => {
+
+        db.query(`SELECT id FROM employees WHERE CONCAT (first_name, " ", last_name) = ?`, manager, (err, managerResults) => {
             if (err) {
                 throw err
             }
-            const managerID =results[0].id;
+            const managerID = managerResults[0].id;
 
         db.query(`INSERT INTO employees(first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [firstName, lastName, roleID, managerID], (err, results) => {
                     if (err) {
@@ -197,12 +198,12 @@ function addEmployee() {
                     }
                     console.log('Added new employee!')
                     promptList();
-            });
+             });
+           });
         });
+      });
     });
   });
- });
-});
 };
 
 
