@@ -18,13 +18,13 @@ VALUES ("Sales Lead", 75000, 1),
        ("Account Manager", 70000, 5);
 
 INSERT INTO employees (first_name, last_name, role_id, manager_id)
-VALUES ("John", "Doe", 1, 1),
-       ("Jane", "Dee", 2, NULL),
-       ("Harry", "Smith", 3, 2),
-       ("Caroline", "White", 4, NULL),
-       ("Celia", "Williams", 5, 3),
-       ("George", "Jones", 6, NULL),
-       ("Cheryl", "Johnson", 7, 4),
-       ("Michael", "Garcia", 8, NULL),
-       ("Gary", "Brown", 9, 5),
-       ("Christina", "Lee", 10, NULL);
+VALUES ("John", "Doe", 1, NULL),
+       ("Jane", "Dee", 2, 1),
+       ("Harry", "Smith", 3, NULL),
+       ("Caroline", "White", 4, 2),
+       ("Celia", "Williams", 5, NULL),
+       ("George", "Jones", 6, 3),
+       ("Cheryl", "Johnson", 7, NULL),
+       ("Michael", "Garcia", 8, 4),
+       ("Gary", "Brown", 9, NULL),
+       ("Christina", "Lee", 10, 5);
