@@ -71,7 +71,7 @@ function viewRoles() {
 };
 
 function viewEmployees() {
-    db.query('SELECT employees.id, employees.first_name, employees.last_name, manager.first_name, roles.title, departments.names AS "Department Names", roles.salary, employees.manager_id AS "Manager" FROM employees INNER JOIN roles ON employees.role_id = roles.id INNER JOIN departments ON roles.department_id = departments.id RIGHT JOIN employees manager ON manager.id = employees.manager_id', (err, results) => {
+    db.query('SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.names AS "Department Names", roles.salary, CONCAT(manager.first_name, " ", manager.last_name) AS "Manager" FROM employees INNER JOIN roles ON employees.role_id = roles.id INNER JOIN departments ON roles.department_id = departments.id LEFT JOIN employees manager ON manager.id = employees.manager_id', (err, results) => {
         if (err) {
             throw err
         }
@@ -79,6 +79,7 @@ function viewEmployees() {
         promptList();
     });
 };
+
 
 function addDepartment () {
    inquirer .prompt([
