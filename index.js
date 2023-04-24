@@ -146,7 +146,11 @@ function addRole () {
 };
 
 function addEmployee() {
-    db.query('SELECT * FROM roles', 'SELECT * FROM employees', function (err, results) {
+    db.query('SELECT * FROM roles', function (err, roleResults) {
+        if(err) {
+            throw err
+        }
+    db.query('SELECT * FROM employees', function (err, employeeResults) {
     inquirer .prompt([
         {
             type: 'input',
@@ -162,13 +166,13 @@ function addEmployee() {
             type: 'rawlist',
             message: 'What is their role?',
             name: 'employeeRole',
-            choices: results.map(roles => `${roles.title}`)
+            choices: roleResults.map(roles => `${roles.title}`)
         },
         {
             type: 'rawlist',
            message: 'Who is their manager?',
            name: 'manager',
-           choices: results.map(employees => `${employees.manager_id}`)
+           choices: employeeResults.map(employees => `${employees.first_name} ${employees.last_name}`)
          }
     ]).then (answer => {
         const firstName = answer.firstName;
@@ -181,8 +185,13 @@ function addEmployee() {
                 throw err
             }
             const roleID = results[0].id
+        db.query(`SELECT id FROM employees WHERE CONCAT (first_name, " ", last_name)`, manager, (err, results) => {
+            if (err) {
+                throw err
+            }
+            const managerID =results[0].id;
 
-            db.query(`INSERT INTO employees(first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [firstName, lastName, roleID, manager], (err, results) => {
+        db.query(`INSERT INTO employees(first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [firstName, lastName, roleID, managerID], (err, results) => {
                     if (err) {
                         throw err
                     }
@@ -192,6 +201,8 @@ function addEmployee() {
         });
     });
   });
+ });
+});
 };
 
 
