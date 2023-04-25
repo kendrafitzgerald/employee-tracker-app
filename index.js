@@ -1,8 +1,9 @@
+// variables for packages
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const table = require('console.table');
 
-
+// connection to mysql
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -10,6 +11,7 @@ const db = mysql.createConnection({
     database: 'employeetracker_db'
 
 });
+//function to display list of questions
 function promptList() {
 inquirer
 .prompt ([
@@ -23,6 +25,7 @@ inquirer
 
     },
 ]).then(answer => {
+    //given user answer to prompt, calls functions that either display tables or give user opportunity to change database
     switch(answer.viewAll) {
         case 'View All Departments':
             viewDepartments();
@@ -48,39 +51,43 @@ inquirer
     }
    });
 };
+//calls promptList function once applicaiton begins
 promptList();
-
+// Selects columns and values from departments tables and displays it on screen
 function viewDepartments() {
-    db.query('SELECT * FROM departments', (err, results) => {
+    db.query('SELECT id as "Department ID", names as "Departments" FROM departments', (err, results) => {
         if (err) {
             throw err;
         } 
         console.table(results);
+        //calls promptList function so it immediately repopulates under table
         promptList();
     });
 };
-
+//Selects columns and values from roles table and displays it on screen, handles JOIN for department and role keys
 function viewRoles() {
-    db.query('SELECT roles.title, roles.id, departments.names, roles.salary FROM roles INNER JOIN departments ON roles.department_id = departments.id', (err, results) => {
+    db.query('SELECT roles.title AS "Job Title", roles.id AS "Role ID", departments.names AS "Department", roles.salary AS "Salary" FROM roles INNER JOIN departments ON roles.department_id = departments.id', (err, results) => {
         if (err) {
             throw err;
         }
         console.table(results);
+        //calls promptList function so it immediately repopulates under table
         promptList();
     });
 };
-
+//Selects columns and values from employees table and displays it on screen, handles JOIN for role ids, department ids, and assigns manager to each employee 
 function viewEmployees() {
-    db.query('SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.names AS "Department Names", roles.salary, CONCAT(manager.first_name, " ", manager.last_name) AS "Manager" FROM employees INNER JOIN roles ON employees.role_id = roles.id INNER JOIN departments ON roles.department_id = departments.id LEFT JOIN employees manager ON manager.id = employees.manager_id', (err, results) => {
+    db.query('SELECT employees.id AS "Employee ID", employees.first_name AS "First Name", employees.last_name AS "Last Name", roles.title AS "Job Title", departments.names AS "Department", roles.salary AS "Salary", CONCAT(manager.first_name, " ", manager.last_name) AS "Manager" FROM employees INNER JOIN roles ON employees.role_id = roles.id INNER JOIN departments ON roles.department_id = departments.id LEFT JOIN employees manager ON manager.id = employees.manager_id', (err, results) => {
         if (err) {
             throw err
         }
         console.table(results)
+        //calls promptList function so it immediately repopulates under table
         promptList();
     });
 };
 
-
+//prompts user to input text for a new department name then takes the answer to insert a new set of values into the departments table
 function addDepartment () {
    inquirer .prompt([
         {
@@ -94,12 +101,14 @@ function addDepartment () {
             if (err) {
                 throw err
             }
-            console.log('Added new department!')
+            //alerts user they successfully added new department
+            console.log('Added new department!');
+            //calls promptList function so it immediately repopulates under success notice
             promptList();
         });
    });
 };
-
+//prompts user to input a new role, input a new salary, and select a pre-existing department to insert the new values to the roles table
 function addRole () {
    db.query('SELECT * FROM departments', function (err, results) {
 
@@ -135,7 +144,9 @@ function addRole () {
                 if (err) {
                     throw err
                 }
+                //alerts user if new role was successfully added
                 console.log('Added new role!');
+                //calls promptList function so it immediately repopulates under success notice
                 promptList();
 
             });
@@ -144,7 +155,7 @@ function addRole () {
     });
   });
 };
-
+//prompts user to add a new employee name, assign a pre-existing role to the employee, and assign an existing manager to the employee then insert the new values into the employees table
 function addEmployee() {
     db.query('SELECT * FROM roles', function (err, roleResults) {
         if(err) {
@@ -196,7 +207,9 @@ function addEmployee() {
                     if (err) {
                         throw err
                     }
-                    console.log('Added new employee!')
+                    //alerts user if the new employee was added successfully
+                    console.log('Added new employee!');
+                    //calls promptList function so it immediately repopulates under success notice
                     promptList();
              });
            });
@@ -206,7 +219,7 @@ function addEmployee() {
   });
 };
 
-
+//prompts user to update an employees role by choosing a pre-existing employee and then updating them to a pre-existing role before updating that employee's information in the employees table
 function updateEmployeeRole() {
     db.query('SELECT * FROM employees', function (err, employeeResults) {
         if (err) {
@@ -243,7 +256,9 @@ function updateEmployeeRole() {
                         if (err) {
                             throw err;
                         }
+                        //alerts user if employee was updated successfully
                         console.log('Updated employee role!');
+                        //calls promptList function so it immediately repopulates under success notice
                         promptList();
                     });
                 });

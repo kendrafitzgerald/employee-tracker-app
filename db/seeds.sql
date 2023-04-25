@@ -1,3 +1,6 @@
+
+/* Starting seed data for the departments, roles, and employees table*/
+
 INSERT INTO departments (names)
 VALUES ("Sales"),
        ("Engineering"),
